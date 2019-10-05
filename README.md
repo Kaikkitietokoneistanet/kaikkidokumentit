@@ -25,7 +25,7 @@ Seuraavaksi aja seuraava komento phpmyadminissa tai vastaavassa:
     
     osoite VARCHAR(30) NOT NULL,
     
-    email VARCHAR(50) NOT NULL,
+    email VARCHAR(254) NOT NULL,
     
     sisältö VARCHAR(10000) NOT NULL,
     
