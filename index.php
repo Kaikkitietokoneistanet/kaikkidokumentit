@@ -1,4 +1,7 @@
 <?php
+    #Asettaa tekstinmuokkaus-ominaisuudet
+    $omatagi = array("[u]", "[i]", "[b]")
+    $htmltagi = array("<u>", "<i>", "<b>")
 
     $servername = "ip-osoite tai domain";
     $username = "käyttäjänimi";
@@ -19,8 +22,8 @@
 
     //Save data
     if ($_POST["datasave"] != "" || $_POST["nimisave"] != "") {
-        $datasave = $_POST["datasave"];
-        $nimisave = $_POST["nimisave"];
+        $datasave = preg_replace($htmltagi, $omatagi, $_POST["datasave"]);
+        $nimisave = preg_replace($htmltagi, $omatagi, $_POST["nimisave"]);
         $url = $_POST["url"];
 
 
@@ -187,7 +190,7 @@ class=\"w3-button w3-display-topright\">&times;</span>
                     </div>
                 </div>
                 <?php
-                echo "<hr><div class='w3-padding-16'><p id='data' style='min-height: 40%; width: 100%;' class='notes w3-container' contenteditable='true'>" . $row["sisältö"]. "</p></div>";
+                echo "<hr><div class='w3-padding-16'><p id='data' style='min-height: 40%; width: 100%;' class='notes w3-container' contenteditable='true'>" . preg_replace($omatagu, $htmlatagi, $row["sisältö"]) . "</p></div>";
             }
         } else {
             echo "Tiedostoa ei ole olemassa";
