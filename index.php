@@ -1,7 +1,8 @@
 <?php
-    $servername = "localhost";
-    $username = "c1_documents";
-    $password = "LGAbs#qYusdG8";
+
+    $servername = "ip-osoite tai domain";
+    $username = "käyttäjänimi";
+    $password = "salasana";
     $dbname = "c1_documents";
 
     // Create connection
