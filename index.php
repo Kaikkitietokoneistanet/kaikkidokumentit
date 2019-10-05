@@ -147,6 +147,9 @@ class=\"w3-button w3-display-topright\">&times;</span>
                         function tallenna() {
                             var nimi = $( \"#nimi\" ).val();
                             var data = document.getElementById(\"data\").innerHTML;
+                            var a = document.createElement(\"textarea\");
+                            a.innerHTML = data;
+                            data = a.value;
                             $.post( \"\", { datasave: data, nimisave: nimi, url: '" . $osoite . "' } );
                             alert('Tallennettu');
                         }
