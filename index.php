@@ -19,8 +19,8 @@
 
     //Save data
     if ($_POST["datasave"] != "" || $_POST["nimisave"] != "") {
-        $datasave = $_POST["datasave"];
-        $nimisave = $_POST["nimisave"];
+        $datasave = htmlentities($_POST["datasave"]);
+        $nimisave = htmlentities($_POST["nimisave"]);
         $url = $_POST["url"];
 
 
