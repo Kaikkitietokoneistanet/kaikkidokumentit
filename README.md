@@ -41,7 +41,7 @@ Viimeisenä vaihda index.php:n riville 71 viestiksi:
 
  1. Estä sql-injektiot
  2. Lisää kommentit koodiin
- 3. Valitse nimi ohjelmalle
+ 3. Tee oma CSS ja JS -kirjasto ohjelmalle
  4. Tee kustomoitavat asetukset
  5. Tee asennus-ohjelma
 
