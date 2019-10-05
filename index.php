@@ -53,8 +53,8 @@ class=\"w3-button w3-display-topright\">&times;</span>
     //Create new document
     if ($_POST["new"] != "") {
         //Get post data
-        $nimi = $_POST["new"];
-        $email = $_POST["email"];
+        $nimi = htmlentities($_POST["new"]);
+        $email = htmlentities($_POST["email"]);
         $url = generateRandomString(20);
         
         $sql = "INSERT INTO dokumentit (nimi, email, osoite, sisältö)
