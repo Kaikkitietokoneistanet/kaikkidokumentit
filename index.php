@@ -1,4 +1,8 @@
 <?php
+    #Asettaa tekstinmuokkaus-ominaisuudet
+    $omatagi = array("[u]", "[i]", "[b]", "[/u]", "[/i]", "[/b]");
+    $htmltagi = array("<u>", "<i>", "<b>", "</u>", "</i>", "</b>");
+
     $servername = "localhost";
     $username = "username";
     $password = "PassvvOrD";
@@ -18,8 +22,8 @@
 
     //Save data
     if ($_POST["datasave"] != "" || $_POST["nimisave"] != "") {
-        $datasave = $_POST["datasave"];
-        $nimisave = $_POST["nimisave"];
+        $datasave = htmlentities(str_replace($htmltagi, $omatagi, $_POST["datasave"]));
+        $nimisave = htmlentities(str_replace($htmltagi, $omatagi, $_POST["nimisave"]));
         $url = $_POST["url"];
 
 
@@ -52,8 +56,8 @@ class=\"w3-button w3-display-topright\">&times;</span>
     //Create new document
     if ($_POST["new"] != "") {
         //Get post data
-        $nimi = $_POST["new"];
-        $email = $_POST["email"];
+        $nimi = htmlentities($_POST["new"]);
+        $email = htmlentities($_POST["email"]);
         $url = generateRandomString(20);
         
         $sql = "INSERT INTO dokumentit (nimi, email, osoite, sisältö)
@@ -143,6 +147,9 @@ class=\"w3-button w3-display-topright\">&times;</span>
                         function tallenna() {
                             var nimi = $( \"#nimi\" ).val();
                             var data = document.getElementById(\"data\").innerHTML;
+                            var a = document.createElement(\"textarea\");
+                            a.innerHTML = data;
+                            data = a.value;
                             $.post( \"\", { datasave: data, nimisave: nimi, url: '" . $osoite . "' } );
                             alert('Tallennettu');
                         }
@@ -186,7 +193,7 @@ class=\"w3-button w3-display-topright\">&times;</span>
                     </div>
                 </div>
                 <?php
-                echo "<hr><div class='w3-padding-16'><p id='data' style='min-height: 40%; width: 100%;' class='notes w3-container' contenteditable='true'>" . $row["sisältö"]. "</p></div>";
+                echo "<hr><div class='w3-padding-16'><p id='data' style='min-height: 40%; width: 100%;' class='notes w3-container' contenteditable='true'>" . str_replace($omatagi, $htmltagi, $row["sisältö"]) . "</p></div>";
             }
         } else {
             echo "Tiedostoa ei ole olemassa";
@@ -196,3 +203,4 @@ class=\"w3-button w3-display-topright\">&times;</span>
 <footer class="w3-blue">
     Tekijänä: <a href="https://kaikkitietokoneista.net">kaikkitietokoneista.net</a>
 </footer>
+
