@@ -5,7 +5,7 @@ Tekijänä: [kaikkitietokoneista.net](https://kaikkitietokoneista.net)
 ## Asennus
 
 Luo tietokanta (mysql) ja lisää sen tiedot kohtiin $servername, $username, $password ja $dbname alla olevan esimerkin mukaan.
-
+```php
     <?php
     	$servername = "ip-osoite tai domain";
         
@@ -14,9 +14,12 @@ Luo tietokanta (mysql) ja lisää sen tiedot kohtiin $servername, $username, $pa
         $password = "salasana";
         
         $dbname = "c1_documents";
+        
+```
 
 Seuraavaksi aja seuraava komento phpmyadminissa tai vastaavassa:
 
+```mysql
     CREATE TABLE dokumentit (
     
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -32,6 +35,8 @@ Seuraavaksi aja seuraava komento phpmyadminissa tai vastaavassa:
     reg_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     
     )
+
+```
 
 Viimeisenä vaihda index.php:n riville 71 viestiksi:
 
