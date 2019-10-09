@@ -40,7 +40,9 @@ Seuraavaksi aja seuraava komento phpmyadminissa tai vastaavassa:
 
 Viimeisenä vaihda index.php:n riville 71 viestiksi:
 
+```php
     $msg = "Olet tehnyt uuden dokumentin. Voit muokata sitä osoitteessa: asennuksen_url_osoite?edit=$url"; //Muokkaa tähän oma osoite
+```
 
 ## To do
 
