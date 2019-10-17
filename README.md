@@ -1,4 +1,4 @@
-﻿# Selain-pohjainen dokumenttien hallinta
+﻿# Selainpohjainen dokumenttien hallinta
 
 Tekijänä: [kaikkitietokoneista.net](https://kaikkitietokoneista.net)
 
