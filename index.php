@@ -1,206 +1,279 @@
 <?php
-    #Asettaa tekstinmuokkaus-ominaisuudet
-    $omatagi = array("[u]", "[i]", "[b]", "[/u]", "[/i]", "[/b]");
-    $htmltagi = array("<u>", "<i>", "<b>", "</u>", "</i>", "</b>");
+  session_start();
 
-    $servername = "localhost";
-    $username = "username";
-    $password = "PassvvOrD";
-    $dbname = "database";
+  $dbpalvelimenosoite = "ip-osoite tai hostname";
+  $dbkayttajanimi = "kayttajanimi";
+  $dbsalasana = "salis";
+  $dbnimi = "databasen_nimi";
 
-    // Create connection
-    $conn = new mysqli($servername, $username, $password, $dbname);
-    // Check connection
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
+  /*
+  CREATE TABLE dokumentit (
 
-    //Random stringin generointi funktio
-    function generateRandomString($length = 10) {
-        return substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil($length/strlen($x)) )),1,$length);
-    }
+  id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 
-    //Save data
-    if ($_POST["datasave"] != "" || $_POST["nimisave"] != "") {
-        $datasave = htmlentities(str_replace($htmltagi, $omatagi, $_POST["datasave"]));
-        $nimisave = htmlentities(str_replace($htmltagi, $omatagi, $_POST["nimisave"]));
-        $url = $_POST["url"];
+  kayttajanimi VARCHAR(100) NOT NULL,
 
+  osoite VARCHAR(50) NOT NULL,
 
-        // Create connection
-        $conn = new mysqli($servername, $username, $password, $dbname);
-        // Check connection
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        } 
+  sisältö VARCHAR(100000) NOT NULL,
 
-        $sql = "UPDATE dokumentit SET sisältö='$datasave', nimi='$nimisave' WHERE osoite='$url'";
+  reg_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 
-        if ($conn->query($sql) === TRUE) {
-            $message = "
-            <div class='w3-panel w3-green'>
-                <span onclick=\"this.parentElement.style.display='none'\"
-class=\"w3-button w3-display-topright\">&times;</span>
-                <h3>Tallennettu!</h3>
-            </div> 
-            ";
-        } else {
-            echo "Error updating record: " . $conn->error;
+  )
+
+  */
+ ?>
+<!DOCTYPE html>
+<html lang="fi" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Dokumentit | kaikkitietokoneista.net</title>
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+     <script src="//ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+     <link href="//cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote.css" rel="stylesheet">
+     <script src="//cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote.js"></script>
+  </head>
+  <body>
+    <?php include 'ylaosa.php'; ?>
+    <?php
+    if (isset($_SESSION["kirjautunut"])) {
+      if ($_POST["sisalto"] != "") {
+        $yhdistys = new mysqli($dbpalvelimenosoite, $dbkayttajanimi, $dbsalasana, $dbnimi);
+
+        $osoite = $_POST["osoite"];
+        $osoiteuusi = $_POST["osoiteuusi"];
+        $tallennettava = $_POST["sisalto"];
+        $kayttajanimi = $_SESSION["kirjautunut"];
+
+        $sql = "UPDATE dokumentit SET sisältö='$tallennettava', osoite='$osoiteuusi' WHERE osoite='$osoite' AND kayttajanimi='$kayttajanimi'";
+
+        if ($yhdistys->query($sql) === TRUE) {
+          ?>
+          <div class="container">
+            <div class="alert alert-success alert-dismissible" role="alert">
+              <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
+              <strong>Tallennettu</strong> kohteeseen <?php echo $osoiteuusi; ?>.
+            </div>
+          </div>
+          <?php
+        }
+        $yhdistys->close();
+      }
+
+      if ($_GET["nimi"] != "") {
+        $nimi = $_GET["nimi"];
+
+        $yhdistys = new mysqli($dbpalvelimenosoite, $dbkayttajanimi, $dbsalasana, $dbnimi);
+
+        if ($yhdistys->connect_error) {
+          mail($sysadmin, "Sivustolla ongelma MySQL:n kanssa", $conn->connect_error);
         }
 
-        $conn->close();
-    }
+        $kayttajanimi = $_SESSION["kirjautunut"];
+        $sql = "SELECT osoite, sisältö FROM dokumentit WHERE osoite='$nimi'";
+        $vastaus = $yhdistys->query($sql);
 
-
-
-    //Create new document
-    if ($_POST["new"] != "") {
-        //Get post data
-        $nimi = htmlentities($_POST["new"]);
-        $email = htmlentities($_POST["email"]);
-        $url = generateRandomString(20);
-        
-        $sql = "INSERT INTO dokumentit (nimi, email, osoite, sisältö)
-        VALUES ('$nimi', '$email', '$url', 'Tervetuloa käyttämään avoimen lähdekoodin dokumentteja.')";
-
-
-        if ($conn->query($sql) === TRUE) {
-
-            $message = "
-            <div class='w3-panel w3-green'>
-                <h3>Tehty!</h3>
-                <p>Voit muokata tekemääsi dokumenttia <a href='?edit=$url'>tässä</a> osoitteessa</p>
-            </div>";
-
-            $msg = "Olet tehnyt uuden dokumentin. Voit muokata sitä osoitteessa: https://kaikkitietokoneista.net/dokumentit?edit=$url"; //Muokkaa tähän oma osoite
-
-            // use wordwrap() if lines are longer than 70 characters
-            $msg = wordwrap($msg,70);
-
-            // send email
-            mail($email,"Uusi dokumentti!", $msg);
-        } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
-        }
-        
-        $conn->close();
-    }
-?>
-
-<head>
-    <link rel="stylesheet" href="w3.css">
-    <script src="jquery-3.4.1.min.js"></script>
-    <meta charset="utf-8" /> 
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Dokumentit.cf</title>
-    <style>
-        .notes {
-            background-attachment: local;
-            background-image:
-                linear-gradient(to right, white 10px, transparent 10px),
-                linear-gradient(to left, white 10px, transparent 10px),
-                repeating-linear-gradient(white, white 30px, #ccc 30px, #ccc 31px, white 31px);
-            line-height: 31px;
-            padding: 8px 10px;
-        }
-    </style>
-</head>
-
-<div id="modal" class="w3-modal">
-    <div class="w3-modal-content">
-      <div class="w3-container w3-padding-16">
-        <form action="" method="POST">
-            <span onclick="document.getElementById('modal').style.display='none'" class="w3-button w3-display-topright">&times;</span>
-            <h1>Tee uusi dokumentti</h1>
-            <input type="text" name="new" id="documentname" placeholder="Dokumentin nimi..." class="w3-input w3-border" autocomplete="off">
-            <br>
-            <input type="text" name="email" id="email" placeholder="Sähköpostisi..." class="w3-input w3-border">
-            <br>
-            <button type="submit" class="w3-button w3-black" id="luo">Luo</button>
-        </form>
-      </div>
-    </div>
-</div>
-
-<header class="w3-blue">
-    <button class="w3-button w3-circle w3-black" onclick="document.getElementById('modal').style.display='block'" title="Uusi dokumentti">+</button>
-</header>
-<?php
-    if ($message != "") {
-        echo $message;
-    }
-?>
-<?php
-    if ($_GET["edit"] != "") {
-        $osoite = $_GET["edit"];
-        $sql = "SELECT * FROM dokumentit
-        WHERE osoite='$osoite';";
-        $result = $conn->query($sql);
-
-        if ($result->num_rows > 0) {
-            $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
+        if ($vastaus->num_rows > 0) {
             // output data of each row
-            while($row = $result->fetch_assoc()) {
-                echo "<div class='w3-row'><input type='text' id='nimi' class='w3-input w3-border' value='" . $row["nimi"]. "'>";
-                echo "
-                    <script>
-                        function tallenna() {
-                            var nimi = $( \"#nimi\" ).val();
-                            var data = document.getElementById(\"data\").innerHTML;
-                            var a = document.createElement(\"textarea\");
-                            a.innerHTML = data;
-                            data = a.value;
-                            $.post( \"\", { datasave: data, nimisave: nimi, url: '" . $osoite . "' } );
-                            alert('Tallennettu');
-                        }
-                    </script>
-                ";
-                ?>
+            echo "<div class='container'>";
+            while($rivi = $vastaus->fetch_assoc()) {
+              ?>
+              <script>
+              function download(filename, text) {
+                var element = document.createElement('a');
+                element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+                element.setAttribute('download', filename);
 
-                    <div class="w3-border w3-third w3-container">
-                        <button class="w3-button" onclick="document.execCommand('italic',false,null);" title="Kursivoitua teksitä"><i>I</i>
-                        </button>
-                        <button class="w3-button" onclick="document.execCommand( 'bold',false,null);" title="Tummennettua tekstiä"><b>B</b>
-                        </button>
-                        <button class="w3-button" onclick="document.execCommand( 'underline',false,null);"><u>U</u>
-                        </button>
-                    </div>
+                element.style.display = 'none';
+                document.body.appendChild(element);
 
-                    <button class="w3-button w3-third w3-cyan" onclick="tallenna()">Tallenna</button>
+                element.click();
 
-                    <!-- Avaa modaali -->
-                    <button onclick="document.getElementById('jakomodaali').style.display='block'"
-                    class="w3-button w3-black w3-right w3-third">Jaa</button>
-                </div>
-                <!-- The Modal -->
-                <div id="jakomodaali" class="w3-modal">
-                    <div class="w3-modal-content">
-                        <div class="w3-container w3-padding-16">
-                        <span onclick="document.getElementById('jakomodaali').style.display='none'" 
-                        class="w3-button w3-display-topright">&times;</span>
-                        <p>Jaettava linkki:</p>
-                        <script>
-                            function kopioi() {
-                                var copyText = document.getElementById("linkki");
-                                copyText.select();
-                                copyText.setSelectionRange(0, 99999);
-                                document.execCommand("copy");
-                                alert("Kopioitu!");
-                            }
-                        </script>
-                        <input style="width: 100%;" type="text" readonly="no" value="<?php echo $actual_link; ?>" id="linkki"><br><br><button onclick='kopioi()' class="w3-button w3-black">Kopioi linkki</button>
-                        </div>
-                    </div>
-                </div>
-                <?php
-                echo "<hr><div class='w3-padding-16'><p id='data' style='min-height: 40%; width: 100%;' class='notes w3-container' contenteditable='true'>" . str_replace($omatagi, $htmltagi, $row["sisältö"]) . "</p></div>";
+                document.body.removeChild(element);
+              }
+              </script>
+              <div class="container">
+                <form method="POST" action="" id="lahetyslomake">
+                  <div class="form-group">
+                    <input type="text" value="<?php echo $rivi["osoite"]; ?>" name="osoiteuusi">
+                  </div>
+                  <div class="hiddenit"></div>
+                  <input type='hidden' name='osoite' value='<?php echo $rivi["osoite"] ?>'>
+                  <input type='submit' class="btn btn-primary" value='Tallenna'>
+                  <a id="lataa" class="btn btn-success">Lataa <?php echo $rivi["osoite"]; ?>.html</a>
+                </form>
+                <script>
+                  $("#lataa").click(function() {
+                    download('<?php echo $rivi["osoite"]; ?>.html', '<meta charset="utf-8" /> ' + $('#summernote').summernote('code'));
+                  });
+                </script>
+                <hr>
+                <div id="summernote"><?php echo $rivi["sisältö"]; ?></div>
+              <?php
             }
-        } else {
-            echo "Tiedostoa ei ole olemassa";
-        }
-    }
-?>
-<footer class="w3-blue">
-    Tekijänä: <a href="https://kaikkitietokoneista.net">kaikkitietokoneista.net</a>
-</footer>
+          }
+        ?>
+        </div>
+        <script>
+        $(document).ready(function() {
+          $('#summernote').summernote();
+        });
 
+        function tallennahiddeninputtiin() {
+          var hvalue = $('#summernote').summernote('code');
+          $(".hiddenit").html("<input type='hidden' name='sisalto' value=' " + hvalue + " '/>");
+        }
+
+        setInterval(tallennahiddeninputtiin, 300);
+        </script>
+        <?php
+      } else {
+        if ($_GET["uusinimi"] != "") {
+          $yhdistys = new mysqli($dbpalvelimenosoite, $dbkayttajanimi, $dbsalasana, $dbnimi);
+
+          if ($yhdistys->connect_error) {
+            mail($sysadmin, "Sivustolla ongelma MySQL:n kanssa", $conn->connect_error);
+          }
+
+          $stmt = $yhdistys->prepare("INSERT INTO dokumentit (kayttajanimi, osoite, sisältö) VALUES (?, ?, ?)");
+          $stmt->bind_param("sss", $kayttajanimi, $nimi, $sisältö);
+
+          $kayttajanimi = $_SESSION["kirjautunut"];
+          $nimi = $_GET["uusinimi"];
+          $sisältö = "<h1>Tiedosto nimeltä $nimi</h1><p>on muokattava.</p>";
+          $stmt->execute();
+
+          ?>
+          <script>
+          location.search = "";
+          </script>
+          <?php
+
+          $stmt->close();
+          $yhdistys->close();
+        }
+
+        if ($_GET["poista"] != "") {
+          $yhdistys = new mysqli($dbpalvelimenosoite, $dbkayttajanimi, $dbsalasana, $dbnimi);
+
+          if ($yhdistys->connect_error) {
+            mail($sysadmin, "Sivustolla ongelma MySQL:n kanssa", $conn->connect_error);
+          }
+
+          $stmt = $yhdistys->prepare("DELETE FROM dokumentit WHERE osoite=? AND kayttajanimi=?;");
+          $stmt->bind_param("ss", $nimi, $kayttajanimi);
+
+          $kayttajanimi = $_SESSION["kirjautunut"];
+          $nimi = $_GET["poista"];
+          $stmt->execute();
+
+          ?>
+          <script>
+          location.search = "";
+          </script>
+          <?php
+
+          $stmt->close();
+          $yhdistys->close();
+        }
+
+        $yhdistys = new mysqli($dbpalvelimenosoite, $dbkayttajanimi, $dbsalasana, $dbnimi);
+
+        if ($yhdistys->connect_error) {
+          mail($sysadmin, "Sivustolla ongelma MySQL:n kanssa", $conn->connect_error);
+        }
+
+        $kayttajanimi = $_SESSION["kirjautunut"];
+        $sql = "SELECT osoite FROM dokumentit WHERE kayttajanimi='$kayttajanimi'";
+        $vastaus = $yhdistys->query($sql);
+
+        if ($vastaus->num_rows > 0) {
+            // output data of each row
+            echo "<div class='container'>";
+            while($rivi = $vastaus->fetch_assoc()) {
+              ?>
+              <div class="col-md-4">
+                <h4><?php echo $rivi["osoite"]; ?></h4>
+                <a href='?poista=<?php echo $rivi["osoite"]; ?>'><span class='glyphicon glyphicon-trash'></span></a><a href='?nimi=<?php echo $rivi["osoite"]; ?>'><span class='glyphicon glyphicon-edit'></span></a>
+              </div>
+              <?php
+            }
+            echo "</div>";
+            ?>
+
+            <a data-toggle="modal" href="#luouusi" class="btn btn-success btn-sm" style="position: absolute; bottom: 20px; right: 20px;">
+              <span class="glyphicon glyphicon-plus"></span>
+            </a>
+            <!-- Modal -->
+              <div class="modal fade" id="luouusi" role="dialog">
+                <div class="modal-dialog">
+
+                  <!-- Modal content-->
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Uusi tiedosto</h4>
+                    </div>
+                    <div class="modal-body">
+                      <form action="">
+                        <div class="form-group">
+                          <label for="uusinimi">Nimi:</label>
+                          <input type="text" class="form-control" id="uusinimi" name="uusinimi">
+                        </div>
+                        <button type="submit" class="btn btn-success">Luo</button>
+                      </form>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Sulje</button>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+            <?php
+        } else {
+          ?>
+          <div class="container">
+            <center><h1><div class="text-muted small">Täällä ei ole mitään... Luo tiedosto painamalla + merkkiä oikeassa alakulmassa.</h1></center>
+          </div>
+
+          <a data-toggle="modal" href="#luouusi" class="btn btn-success btn-sm" style="position: absolute; bottom: 20px; right: 20px;">
+            <span class="glyphicon glyphicon-plus"></span>
+          </a>
+          <!-- Modal -->
+            <div class="modal fade" id="luouusi" role="dialog">
+              <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Uusi tiedosto</h4>
+                  </div>
+                  <div class="modal-body">
+                    <form action="">
+                      <div class="form-group">
+                        <label for="uusinimi">Nimi:</label>
+                        <input type="text" class="form-control" id="uusinimi" name="uusinimi">
+                      </div>
+                      <button type="submit" class="btn btn-success">Luo</button>
+                    </form>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Sulje</button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          <?php
+        }
+      }
+    }
+    ?>
+  </body>
+</html>
