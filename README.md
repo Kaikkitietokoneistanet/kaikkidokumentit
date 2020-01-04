@@ -4,7 +4,7 @@ Tekijänä: [kaikkitietokoneista.net](https://kaikkitietokoneista.net) ja [roy.t
 
 ## Asennus
 
-Luo tietokanta (mysql) ja lisää sen tiedot kohtiin $servername, $username, $password ja $dbname alla olevan esimerkin mukaan.
+Luo tietokanta (mysql) ja lisää sen tiedot kohtiin $dbpalvelimenosoite, $dbkayttajanimi, dbsalasanapassword ja $dbnimi alla olevan esimerkin mukaan.
 ```php
     <?php
       session_start();
