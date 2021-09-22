@@ -1,0 +1,10 @@
+{
+  "name": "SimpleDocument-backend",
+  "version": "1.0.0",
+  "description": "SimpleDocument backend server",
+  "main": "app.js",
+  "repository": "https://github.com/kaikkitietokoneista/SimpleDocument",
+  "author": "Kaikkitietokoneista",
+  "license": "AGPLv3",
+  "private": true
+}
