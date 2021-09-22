@@ -6,5 +6,8 @@
   "repository": "https://github.com/kaikkitietokoneista/SimpleDocument",
   "author": "Kaikkitietokoneista",
   "license": "AGPLv3",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "@hapi/hapi": "^20.2.0"
+  }
 }
