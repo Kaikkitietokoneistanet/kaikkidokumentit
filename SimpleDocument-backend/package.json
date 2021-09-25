@@ -8,6 +8,8 @@
   "license": "AGPLv3",
   "private": true,
   "dependencies": {
-    "@hapi/hapi": "^20.2.0"
+    "@hapi/hapi": "^20.2.0",
+    "mongodb": "^4.1.2",
+    "uuid": "^8.3.2"
   }
 }
