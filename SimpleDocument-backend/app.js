@@ -3,7 +3,7 @@
 const Hapi = require('@hapi/hapi');
 const { MongoClient } = require('mongodb');
 
-const { newDocument } = require('./document')
+const { newDocument, getDocumentByUuid } = require('./document')
 
 const init = async () => {
     const url = process.env.MONGO_URL;
@@ -30,8 +30,6 @@ const init = async () => {
         method: 'POST',
         path: '/',
         handler: (request, h) => {
-            console.log(request.payload.owner);
-
             if ("owner" in request.payload && "content" in request.payload && "name" in request.payload) {
                 return newDocument(
                     request.payload.name, 
@@ -42,6 +40,25 @@ const init = async () => {
             } else {
                 let data = {
                     "error": "Owner, content or name was not found in request JSON."
+                };
+
+                return h.response(data).code(400);
+            }
+        }
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/',
+        handler: (request, h) => {
+            if ("uuid" in request.query) {
+                return getDocumentByUuid(
+                    request.query.uuid, 
+                    collection
+                );
+            } else {
+                let data = {
+                    "error": "Uuid was not found in request JSON."
                 };
 
                 return h.response(data).code(400);

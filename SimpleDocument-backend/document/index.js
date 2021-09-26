@@ -1,1 +1,2 @@
-exports.newDocument = require('./newDocument')
+exports.newDocument = require('./newDocument');
+exports.getDocumentByUuid = require('./getDocumentByUuid');
